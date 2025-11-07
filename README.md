@@ -55,11 +55,47 @@ uv run python weather.py
 
 ---
 
+## ✅ コマンドライン引数（新機能）
+
+`weather.py` はコマンドライン引数に対応し、より柔軟に天気情報を取得できます。
+
+- 都市名指定例:
+
+```bash
+uv run python weather.py tokyo
+```
+
+- 緯度経度指定:
+
+```bash
+uv run python weather.py --lat 35.6895 --lon 139.6917
+```
+
+- 温度単位切替（摂氏または華氏）:
+
+```bash
+uv run python weather.py --units f
+```
+
+- 時間ごとの予報表示（直近N時間）:
+
+```bash
+uv run python weather.py --hourly 5
+```
+
+これらのオプションを組み合わせて使うことも可能です。
+
+---
+
 ## ✅ 天気情報の取得方法について
 
 Open-Meteo API を使用しています：
 
 https://open-meteo.com/en/docs
+
+さらに、都市名から緯度経度を取得するためにジオコーディング API も利用しています：
+
+https://geocoding-api.open-meteo.com/v1/search
 
 送信する主なパラメータ:
 - latitude（緯度）
