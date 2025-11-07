@@ -39,6 +39,16 @@ WEATHER_MAP = {
 }
 
 def geocode(name: str, lang: str = "ja") -> Optional[tuple[float, float, str]]:
+  """都市名から緯度経度情報を取得する。
+
+  Args:
+    name (str): 検索する都市名
+    lang (str, optional): 結果の言語. デフォルトは "ja"
+
+  Returns:
+    Optional[tuple[float, float, str]]: (緯度, 経度, 場所のラベル)のタプル。
+      見つからない場合はNone
+  """
   url = "https://geocoding-api.open-meteo.com/v1/search"
   params = {"name": name, "count": 1, "language": lang}
   try:
@@ -55,7 +65,21 @@ def geocode(name: str, lang: str = "ja") -> Optional[tuple[float, float, str]]:
     print("ジオコーディング失敗:", e)
     return
 
-def fetch_weather(lat: float, lon: float, units: str, hours: int):
+def fetch_weather(lat: float, lon: float, units: str, hours: int) -> dict:
+  """指定された座標の天気情報をOpen-Meteo APIから取得する。
+
+  Args:
+    lat (float): 緯度
+    lon (float): 経度
+    units (str): 温度単位 ("c" または "f")
+    hours (int): 取得する時間予報の時間数
+
+  Returns:
+    dict: APIレスポンスの JSON データ
+
+  Raises:
+    SystemExit: API リクエストが失敗した場合
+  """
   url = "https://api.open-meteo.com/v1/forecast"
   params = {
     "latitude": lat,
@@ -75,7 +99,23 @@ def fetch_weather(lat: float, lon: float, units: str, hours: int):
     print("天気取得に失敗:", e)
     sys.exit(1)
 
-def pick_next_hours(hourly_times, hourly_temps, now_iso: str, n: int):
+def pick_next_hours(
+  hourly_times: list[str],
+  hourly_temps: list[float],
+  now_iso: str,
+  n: int
+) -> list[tuple[str, float]]:
+  """現在時刻から指定時間数分の気温データを抽出する。
+
+  Args:
+    hourly_times (list[str]): 時刻のリスト
+    hourly_temps (list[float]): 気温のリスト
+    now_iso (str): 現在時刻（ISO形式 例: "2025-11-07T21:00"）
+    n (int): 取得する時間数
+
+  Returns:
+    list[tuple[str, float]]: (時刻, 気温)のタプルのリスト
+  """
   # now_iso 例: "2025-11-07T21:00"
   target = now_iso[:13] + ":00"
   i = bisect.bisect_left(hourly_times, target)
@@ -83,9 +123,22 @@ def pick_next_hours(hourly_times, hourly_temps, now_iso: str, n: int):
   return list(zip(hourly_times[i:end], hourly_temps[i:end]))
 
 def format_unit(units: str) -> str:
+  """温度単位の表示形式を返す。
+
+  Args:
+    units (str): 温度単位 ("c" または "f")
+
+  Returns:
+    str: 表示用の単位文字列（"°C" または "°F"）
+  """
   return "°C" if units == "c" else "°F"
 
-def main():
+def main() -> None:
+  """CLIのメインエントリーポイント。
+
+  コマンドライン引数をパースし、天気情報を取得して表示する。
+  都市名または緯度経度から現在の天気と時間予報（オプション）を表示する。
+  """
   parser = argparse.ArgumentParser(description="Open-Meteo の現在天気と時間予報を表示するCLI（都市名/緯度経度対応）")
   parser.add_argument("query", nargs="?", default="福岡", help="都市名（例: tokyo, fukuoka）。--lat/--lon 指定時は無視")
   parser.add_argument("--lat", type=float, help="緯度を直接指定")
