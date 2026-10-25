@@ -88,6 +88,7 @@ def fetch_weather(lat: float, lon: float, units: str, hours: int) -> dict:
     "hourly": "temperature_2m",
     "timezone": "auto",
     "daily": "temperature_2m_max,temperature_2m_min",
+    "windspeed_unit": "ms",
   }
   if units == "f":
     params["temperature_unit"] = "fahrenheit"
