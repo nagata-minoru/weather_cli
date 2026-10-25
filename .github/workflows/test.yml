@@ -1,0 +1,27 @@
+# PR と main への push のたびに pytest を実行する
+# Python は pyproject.toml の requires-python の下限（3.10）と最新（3.14）で試す
+name: test
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.14']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: uv sync --locked
+      - run: uv run pytest
