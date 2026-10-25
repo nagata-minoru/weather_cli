@@ -1,4 +1,4 @@
-# 依存パッケージの更新PRを週1回作る
+# 依存パッケージ（uv）と GitHub Actions の更新PRを週1回作る
 # 公開から14日たっていない版は使わない（cooldown）。ただしセキュリティ更新には cooldown は効かない
 # PRは通常の更新とセキュリティ更新で分け、それぞれエコシステムごとに1つにまとめる
 version: 2
@@ -13,5 +13,17 @@ updates:
       dependencies:
         patterns: ['*']
       security:
+        applies-to: security-updates
+        patterns: ['*']
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 14
+    groups:
+      actions:
+        patterns: ['*']
+      actions-security:
         applies-to: security-updates
         patterns: ['*']
