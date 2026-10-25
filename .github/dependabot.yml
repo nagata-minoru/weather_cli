@@ -1,0 +1,17 @@
+# 依存パッケージの更新PRを週1回作る
+# 公開から14日たっていない版は使わない（cooldown）。ただしセキュリティ更新には cooldown は効かない
+# PRは通常の更新とセキュリティ更新で分け、それぞれエコシステムごとに1つにまとめる
+version: 2
+updates:
+  - package-ecosystem: uv
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 14
+    groups:
+      dependencies:
+        patterns: ['*']
+      security:
+        applies-to: security-updates
+        patterns: ['*']
